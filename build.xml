@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="package-all" name="jhu5_hw2">
+
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="build.classes.dir" value="${build.dir}/classes" />
+	<property name="web.name" value="jhu5_web" />
+	<property name="ejb.name" value="jhu5_session" />
+	<property name="lib.name" value="jhu5_lib" />
+	<property name="project.name" value="jhu5" />
+	<property name="lib.web.dir" value="WebContent/WEB-INF/lib" />
+	<property name="jboss.home" value="/Users/johnson/Desktop/jboss/jboss-as-7.1.1.Final" />
+
+	<path id="JBoss 7.1 Runtime [JBoss 7.1 Runtime].libraryclasspath">
+		<fileset dir="${jboss.home}/modules/javax">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${jboss.home}/modules/org">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="Web App Libraries.libraryclasspath">
+		<fileset dir="${lib.web.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!--
+    <path id="Web App Libraries.libraryclasspath">
+        <pathelement location="WebContent/WEB-INF/lib/log4j-1.2.17.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/mysql-connector-java-5.1.17-bin.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.aop-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.asm-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.beans-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.context-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.context.support-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.core-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.expression-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.web-3.0.6.RELEASE.jar"/>
+        <pathelement location="WebContent/WEB-INF/lib/org.springframework.web.servlet-3.0.6.RELEASE.jar"/>
+    </path>
+	-->
+
+	<path id="jhu5_hw4.classpath">
+		<pathelement location="${build.classes.dir}" />
+		<path refid="JBoss 7.1 Runtime [JBoss 7.1 Runtime].libraryclasspath" />
+		<path refid="Web App Libraries.libraryclasspath" />
+	</path>
+
+	<target name="prepare">
+		<mkdir dir="build/classes" />
+		<copy includeemptydirs="false" todir="${build.classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="prepare">
+		<echo message="${ant.project.name}: ${ant.file}" />
+		<javac srcdir="${src.dir}" destdir="${build.classes.dir}" includeantruntime="false" debug="on" deprecation="on" optimize="off" includes="**">
+			<classpath refid="jhu5_hw4.classpath" />
+		</javac>
+	</target>
+<!--
+	<target name="package-lib">
+		<jar jarfile="${build.dir}/${lib.name}.jar">
+			<fileset dir="${build.classes.dir}">
+				<include name="**/EmployeeBean.*" />
+			</fileset>
+		</jar>
+	</target>
+-->
+	<target name="package-ejb">
+		<jar jarfile="${build.dir}/${ejb.name}.jar">
+			<fileset dir="${build.classes.dir}">
+				<!--<include name="**/EmployeeManagerImpl.*" />
+				<include name="**/EmployeeManagerRemote.*" />
+				<include name="**/EmployeeBean.*" />-->
+				<include name = "**/ejb/**" />
+			</fileset>
+			<fileset dir="${basedir}/WebContent/">
+				<include name="**/persistence.xml" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="package-web">
+		<war destfile="${build.dir}/${web.name}.war" webxml="${basedir}/WebContent/WEB-INF/web.xml">
+			<classes dir="${build.classes.dir}">
+				<exclude name="**/CopyOfEmployeeRegistrationForm.*"/>
+				<include name="**/mvc/**" />
+				<include name="**/servlets/**" />
+				<include name="**/utils/**" />
+				<include name="**/validators/**" />
+			</classes>
+			<webinf dir="${basedir}/WebContent/WEB-INF/">
+				<exclude name="application.xml" />
+			</webinf>
+		</war>
+	</target>
+
+	<target name="package-all" depends="compile,package-ejb,package-web">
+		<ear destfile="${build.dir}/${project.name}.ear" appxml="${basedir}/WebContent/META-INF/application.xml">
+			<!--
+			<zipfileset dir="${build.dir}" prefix="lib">
+				<include name="${lib.name}.jar" />
+			</zipfileset>
+			-->
+			<fileset dir="${build.dir}" includes="${ejb.name}.jar" />
+			<fileset dir="${build.dir}" includes="${web.name}.war" />
+		</ear>
+	</target>
+
+</project>
