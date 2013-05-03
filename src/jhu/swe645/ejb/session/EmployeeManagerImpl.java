@@ -57,7 +57,7 @@ public class EmployeeManagerImpl implements EmployeeManagerRemote {
 	@Override
 //	@WebMethod(exclude=true)
 	public List<Employee> getAllEmployees() {
-		log.info("Getting all employees. ");
+		log.info("Getting all employees.");
 		List<Employee> employees = new ArrayList<Employee>();
 		String sql = "SELECT e FROM Employee AS e ORDER BY e.lastName";
 		employees = em.createQuery(sql).getResultList();
