@@ -35,7 +35,7 @@ public class EmployeeManagerImpl implements EmployeeManagerRemote {
 	@Override
 //	@WebMethod(exclude=true)
 	public boolean hasEmail(String email) {
-		log.info("Checking to see if " + email + " is unique.");
+		log.info("Checking to see if " + email + " is unique. ");
 		String sql = "SELECT e FROM Employee AS e WHERE e.email LIKE '" + email
 				+ "'";
 		List<Employee> employees = em.createQuery(sql).getResultList();
